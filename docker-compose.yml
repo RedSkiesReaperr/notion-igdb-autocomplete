@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  watcher:
+    build: .
+    env_file: .env
+    command: ["sh", "-c", "watcher"]
+    environment:
+      - UPDATER_HOST=updater
+    depends_on:
+      - updater
+    networks:
+      - igdb-autocomplete
+
+  updater:
+    build: .
+    env_file: .env
+    command: ["sh", "-c", "updater"]
+    environment:
+      - GIN_MODE=release
+    networks:
+      - igdb-autocomplete
+    
+networks:
+  igdb-autocomplete:
+    driver: bridge
