@@ -29,7 +29,12 @@ This Go project aims to automate the completion of video game information in a N
     cp ./example.env .env
     ```
 
-2. Create a Notion database (or configure an already existing one) with the following properties:
+2.
+    >**If you start from scratch**: Duplicate the [Notion template](https://plant-pantry-77c.notion.site/Automated-video-games-library-c833cb560feb4b82935a310e508d34c2?pvs=4) and go to step 4
+    >
+    >**If you already have a Notion database**: Continue to step 3
+
+3. Create a Notion database (or configure an already existing one) with the following properties:
     - Title:
         - Name: Title
         - Type: Title
@@ -50,7 +55,7 @@ This Go project aims to automate the completion of video game information in a N
 
 4. Put your integration API secret as value of the `NOTION_API_SECRET` in your `.env` file.
 
-5. Go on your Notion page, click on the "..." button and on the "copy link" option. As mentionned in [environment variables section](https://developers.notion.com/docs/create-a-notion-integration#environment-variables), Get the ID of your page and put it as value of the `NOTION_PAGE_ID` in your `.env` file.
+5. Go on your Notion databse, click on the "..." button and on the "copy link" option. As mentionned in [environment variables section](https://developers.notion.com/docs/create-a-notion-integration#environment-variables), Get the ID of your database and put it as value of the `NOTION_PAGE_ID` in your `.env` file.
 
 > ***At this point you should have a Notion database, with all mandatory properties. You should have created a private Notion integration connected with you database. You should have a `.env` file in your cloned project directory who have two values filled: `NOTION_API_SECRET` and `NOTION_PAGE_ID`***
 
