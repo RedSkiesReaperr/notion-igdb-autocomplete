@@ -1,18 +1,23 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"notion-igdb-autocomplete/config"
+	"notion-igdb-autocomplete/notion"
 	"strings"
 	"time"
 
 	"github.com/jomei/notionapi"
 )
+
+type updateRequestBody struct {
+	PageID string `json:"page_id,required"`
+	Search string `json:"search,required"`
+}
 
 func main() {
 	config, err := config.Load()
@@ -22,21 +27,24 @@ func main() {
 		log.Println("Successfully loaded config!")
 	}
 
+	notionClient := notion.NewClient(config.NotionAPISecret)
+	log.Println("Successfully created Notion client!")
+
 	titleCleaner := strings.NewReplacer("{{", "", "}}", "")
 
 	log.Println("Looking for pages to update...")
 	for range time.Tick(time.Duration(config.WatcherTickDelay)) {
-		pages, err := fetchPages(config.NotionAPISecret, config.NotionPageID)
+		entries, err := notionClient.Database(config.NotionPageID).GetEntries()
 		if err != nil {
 			log.Fatalf("Unable to fetch pages: %s\n", err)
 		}
 
-		for _, obj := range pages {
-			id := obj.ID
-			title := obj.Properties["Title"].(*notionapi.TitleProperty).Title[0].Text.Content
+		for _, entry := range entries {
+			id := entry.ID
+			title := entry.Properties["Title"].(*notionapi.TitleProperty).Title[0].Text.Content
 			cleanTitle := titleCleaner.Replace(title)
 
-			err = callUpdater(config.UpdaterURL(), updaterBody{PageID: id.String(), Search: cleanTitle})
+			err = callUpdater(config.UpdaterURL(), updateRequestBody{PageID: id.String(), Search: cleanTitle})
 			if err != nil {
 				log.Printf("Unable to update page '%s': %s\n", id, err)
 			} else {
@@ -46,39 +54,7 @@ func main() {
 	}
 }
 
-func fetchPages(apiSecret string, databaseID string) ([]notionapi.Page, error) {
-	notion := notionapi.NewClient(notionapi.Token(apiSecret))
-	query := &notionapi.DatabaseQueryRequest{
-		Filter: &notionapi.AndCompoundFilter{
-			notionapi.PropertyFilter{
-				Property: "Title",
-				RichText: &notionapi.TextFilterCondition{
-					StartsWith: "{{",
-				},
-			},
-			notionapi.PropertyFilter{
-				Property: "Title",
-				RichText: &notionapi.TextFilterCondition{
-					EndsWith: "}}",
-				},
-			},
-		},
-	}
-
-	result, err := notion.Database.Query(context.Background(), notionapi.DatabaseID(databaseID), query)
-	if err != nil {
-		return nil, err
-	}
-
-	return result.Results, nil
-}
-
-type updaterBody struct {
-	PageID string `json:"page_id,required"`
-	Search string `json:"search,required"`
-}
-
-func callUpdater(updaterURL string, payload updaterBody) error {
+func callUpdater(updaterURL string, payload updateRequestBody) error {
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
 		return err

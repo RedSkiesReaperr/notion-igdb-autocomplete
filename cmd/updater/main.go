@@ -1,18 +1,16 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"notion-igdb-autocomplete/config"
 	"notion-igdb-autocomplete/igdb"
+	"notion-igdb-autocomplete/notion"
 	"sort"
-	"time"
 
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
-	"github.com/jomei/notionapi"
 )
 
 type body struct {
@@ -33,7 +31,7 @@ func main() {
 	}
 	log.Println("Successfully created IGDB client!")
 
-	notionClient := notionapi.NewClient(notionapi.Token(config.NotionAPISecret))
+	notionClient := notion.NewClient(config.NotionAPISecret)
 	log.Println("Successfully created Notion client!")
 
 	server := gin.Default()
@@ -52,7 +50,7 @@ func main() {
 			return
 		}
 
-		updatedPage, err := updateNotionPage(payload.PageID, game, notionClient)
+		updatedPage, err := notionClient.Page(payload.PageID).Update(game)
 		if err != nil {
 			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 			return
@@ -79,65 +77,6 @@ func searchIgdbGame(gameName string, client *igdb.Client) (*igdb.Game, error) {
 	}
 
 	return findBestGame(gameName, results), nil
-}
-
-func updateNotionPage(pageID string, game *igdb.Game, notionClient *notionapi.Client) (*notionapi.Page, error) {
-	releaseDate := notionapi.Date(time.Unix(game.ReleaseDate, 0))
-	platforms := game.NotionPlatforms()
-	genres := game.NotionGenres()
-	franchises := game.NotionFranchises()
-
-	updateReq := notionapi.PageUpdateRequest{
-		Cover: &notionapi.Image{
-			Type: "external",
-			External: &notionapi.FileObject{
-				URL: game.CoverURL(),
-			},
-		},
-		Properties: notionapi.Properties{
-			"Title": notionapi.TitleProperty{
-				Type: notionapi.PropertyTypeTitle,
-				Title: []notionapi.RichText{
-					{Text: &notionapi.Text{Content: game.Name}},
-				},
-			},
-			"Release date": notionapi.DateProperty{
-				Type: notionapi.PropertyTypeDate,
-
-				Date: &notionapi.DateObject{
-					Start: &releaseDate,
-				},
-			},
-		},
-	}
-
-	if len(platforms) > 0 {
-		updateReq.Properties["Platforms"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: game.NotionPlatforms(),
-		}
-	}
-
-	if len(franchises) > 0 {
-		updateReq.Properties["Franchises"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: franchises,
-		}
-	}
-
-	if len(genres) > 0 {
-		updateReq.Properties["Genres"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: game.NotionGenres(),
-		}
-	}
-
-	page, err := notionClient.Page.Update(context.Background(), notionapi.PageID(pageID), &updateReq)
-	if err != nil {
-		return nil, err
-	}
-
-	return page, nil
 }
 
 type ComparedGames []ComparedGame
