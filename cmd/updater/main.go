@@ -66,7 +66,7 @@ func main() {
 }
 
 func searchIgdbGame(gameName string, client *igdb.Client) (*igdb.Game, error) {
-	query := igdb.NewSearchQuery(gameName, []string{"name", "platforms.name", "first_release_date", "franchises.name", "genres.name", "cover.image_id"})
+	query := igdb.NewSearchQuery(gameName, "name", "platforms.name", "first_release_date", "franchises.name", "genres.name", "cover.image_id")
 	results, err := client.SearchGame(query)
 	if err != nil {
 		return nil, err
