@@ -1,0 +1,58 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+orbs:
+  go: circleci/go@1.9.0
+  docker: circleci/docker@2.4.0
+
+jobs:
+  build_updater:
+    executor:
+      name: go/default
+      tag: 1.21.1
+    steps:
+      - checkout
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - run:
+          name: Build updater
+          command: go build -v -o ./updater cmd/updater/main.go
+
+  build_watcher:
+    executor:
+      name: go/default
+      tag: 1.21.1
+    steps:
+      - checkout
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - run:
+          name: Build watcher
+          command: go build -v -o ./watcher cmd/watcher/main.go
+
+  test:
+    executor:
+      name: go/default
+      tag: 1.21.1
+    steps:
+      - checkout
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - go/test:
+          covermode: atomic
+          failfast: true
+          race: true
+
+workflows:
+  main:
+    jobs:
+      - build_watcher
+      - build_updater
+      - test:
+          requires:
+            - build_watcher
+            - build_updater
