@@ -36,7 +36,7 @@ type Cover struct {
 	ImageID string `json:"image_id,required"`
 }
 
-type Games []Game
+type Games []*Game
 type Platforms []Platform
 type Franchises []Franchise
 type Genres []Genre

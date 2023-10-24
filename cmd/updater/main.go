@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"notion-igdb-autocomplete/choose"
 	"notion-igdb-autocomplete/config"
 	"notion-igdb-autocomplete/igdb"
 	"notion-igdb-autocomplete/notion"
-	"sort"
 
-	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
 )
 
@@ -76,41 +75,5 @@ func searchIgdbGame(gameName string, client *igdb.Client) (*igdb.Game, error) {
 		return nil, fmt.Errorf("cannot find game '%s'", gameName)
 	}
 
-	return findBestGame(gameName, results), nil
-}
-
-type ComparedGames []ComparedGame
-type ComparedGame struct {
-	Game  igdb.Game
-	Index int
-}
-
-// Implements interface sort.Interface
-func (cg ComparedGames) Len() int {
-	return len(cg)
-}
-
-// Implements interface sort.Interface
-func (cg ComparedGames) Swap(i, j int) {
-	cg[i], cg[j] = cg[j], cg[i]
-}
-
-// Implements interface sort.Interface
-func (cg ComparedGames) Less(i, j int) bool {
-	return cg[i].Index < cg[j].Index
-}
-
-func findBestGame(search string, games igdb.Games) *igdb.Game {
-	var comparisons ComparedGames
-
-	for _, game := range games {
-		comparisons = append(comparisons, ComparedGame{
-			Game:  game,
-			Index: levenshtein.ComputeDistance(search, game.Name),
-		})
-	}
-
-	sort.Sort(comparisons)
-
-	return &comparisons[0].Game
+	return choose.Game(gameName, results), nil
 }
