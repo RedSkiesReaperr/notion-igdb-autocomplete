@@ -76,7 +76,7 @@ func searchIgdbGame(gameName string, client *igdb.Client) (*igdb.Game, error) {
 	}
 
 	if len(results) <= 0 {
-		return nil, fmt.Errorf("cannot find game '%s'", gameName)
+		return &igdb.Game{Name: fmt.Sprintf("Not found (%s)", gameName)}, nil
 	}
 
 	return choose.Game(gameName, results), nil

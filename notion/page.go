@@ -32,13 +32,10 @@ func (p *Page) Update(game *igdb.Game) (*notionapi.Page, error) {
 	return updatedPage, nil
 }
 
-func createUpdateRequest(game *igdb.Game) notionapi.PageUpdateRequest {
+func createUpdateRequest(game *igdb.Game) (request notionapi.PageUpdateRequest) {
 	releaseDate := notionapi.Date(time.Unix(game.ReleaseDate, 0))
-	platforms := game.NotionPlatforms()
-	genres := game.NotionGenres()
-	franchises := game.NotionFranchises()
 
-	request := notionapi.PageUpdateRequest{
+	request = notionapi.PageUpdateRequest{
 		Cover: &notionapi.Image{
 			Type: "external",
 			External: &notionapi.FileObject{
@@ -59,29 +56,20 @@ func createUpdateRequest(game *igdb.Game) notionapi.PageUpdateRequest {
 					Start: &releaseDate,
 				},
 			},
+			"Franchises": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: game.NotionFranchises(),
+			},
+			"Genres": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: game.NotionGenres(),
+			},
+			"Platforms": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: game.NotionPlatforms(),
+			},
 		},
 	}
 
-	if len(platforms) > 0 {
-		request.Properties["Platforms"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: game.NotionPlatforms(),
-		}
-	}
-
-	if len(franchises) > 0 {
-		request.Properties["Franchises"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: franchises,
-		}
-	}
-
-	if len(genres) > 0 {
-		request.Properties["Genres"] = notionapi.MultiSelectProperty{
-			Type:        notionapi.PropertyTypeMultiSelect,
-			MultiSelect: game.NotionGenres(),
-		}
-	}
-
-	return request
+	return
 }

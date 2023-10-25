@@ -45,26 +45,32 @@ func (g *Game) CoverURL() string {
 	return fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.png", g.Cover.ImageID)
 }
 
-func (g *Game) NotionPlatforms() (platforms []notionapi.Option) {
+func (g *Game) NotionPlatforms() []notionapi.Option {
+	platforms := make([]notionapi.Option, 0)
+
 	for _, platform := range g.Platforms {
 		platforms = append(platforms, notionapi.Option{Name: platform.Name})
 	}
 
-	return
+	return platforms
 }
 
-func (g *Game) NotionGenres() (genres []notionapi.Option) {
+func (g *Game) NotionGenres() []notionapi.Option {
+	genres := make([]notionapi.Option, 0)
+
 	for _, genre := range g.Genres {
 		genres = append(genres, notionapi.Option{Name: genre.Name})
 	}
 
-	return
+	return genres
 }
 
-func (g *Game) NotionFranchises() (franchises []notionapi.Option) {
+func (g *Game) NotionFranchises() []notionapi.Option {
+	franchises := make([]notionapi.Option, 0)
+
 	for _, franchise := range g.Franchises {
 		franchises = append(franchises, notionapi.Option{Name: franchise.Name})
 	}
 
-	return
+	return franchises
 }
