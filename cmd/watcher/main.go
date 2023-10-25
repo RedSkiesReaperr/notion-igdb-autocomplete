@@ -20,7 +20,7 @@ type updateRequestBody struct {
 }
 
 func main() {
-	config, err := config.Load()
+	config, err := config.Load("")
 	if err != nil {
 		log.Fatalf("Unable to load config: %s\n", err)
 	} else {
