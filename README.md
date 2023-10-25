@@ -26,7 +26,7 @@ This Go project aims to automate the completion of video game information in a N
 
 1. Create environment configuration file:
     ```sh
-    cp ./example.env .env
+    cp ./.env.example .env
     ```
 
 2.
