@@ -8,7 +8,8 @@ services:
     environment:
       - UPDATER_HOST=updater
     depends_on:
-      - updater
+      updater:
+        condition: service_healthy
     networks:
       - igdb-autocomplete
 
@@ -20,6 +21,11 @@ services:
       - GIN_MODE=release
     networks:
       - igdb-autocomplete
+    healthcheck:
+      test: "wget --no-verbose --tries=1 http://127.0.0.1:${UPDATER_PORT}/heartbeat || exit 1"
+      interval: 2s
+      timeout: 1s
+      retries: 3      
     
 networks:
   igdb-autocomplete:

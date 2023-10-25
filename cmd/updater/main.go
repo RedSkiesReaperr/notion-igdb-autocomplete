@@ -34,6 +34,10 @@ func main() {
 	log.Println("Successfully created Notion client!")
 
 	server := gin.Default()
+	server.GET("/heartbeat", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "I'm alive!"})
+	})
+
 	server.PUT("/", func(ctx *gin.Context) {
 		var payload body
 
