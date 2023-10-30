@@ -8,109 +8,71 @@ import (
 )
 
 func TestCoverURL(t *testing.T) {
-	game := createFullfilledGame()
+	game := Game{Cover: Cover{Id: 1, ImageID: "lich_king"}}
 	result := game.CoverURL()
-	expected := "https://images.igdb.com/igdb/image/upload/t_cover_big/thisIsACoverID.png"
+	expected := "https://images.igdb.com/igdb/image/upload/t_cover_big/lich_king.png"
 
 	if result != expected {
-		t.Errorf("Unexpected coverUrl: expected:%s, got:%s", expected, result)
+		t.Errorf("Unexpected CoverUrl(): expected:%s, got:%s", expected, result)
 	}
 }
 
-func TestNotionPlatformsFullfilled(t *testing.T) {
-	game := createFullfilledGame()
-	result := game.NotionPlatforms()
-	expected := []notionapi.Option{
-		{Name: "Wii"},
-		{Name: "PC"},
+func TestNotionPlatforms(t *testing.T) {
+	var game Game = Game{}
+	var tests = []struct {
+		platforms Platforms
+		expected  []notionapi.Option
+	}{
+		{platforms: Platforms{}, expected: []notionapi.Option{}},
+		{platforms: Platforms{{Id: 1, Name: "Wii"}, {Id: 2, Name: "PC"}}, expected: []notionapi.Option{{Name: "Wii"}, {Name: "PC"}}},
 	}
 
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionPlatforms: expected:%s, got:%s", expected, result)
-	}
-}
+	for _, tt := range tests {
+		game.Platforms = tt.platforms
+		result := game.NotionPlatforms()
 
-func TestNotionPlatformsEmpty(t *testing.T) {
-	game := createFullfilledGame()
-	game.Platforms = nil
-
-	result := game.NotionPlatforms()
-	expected := []notionapi.Option{}
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionPlatforms: expected:%s, got:%s", expected, result)
+		if !reflect.DeepEqual(result, tt.expected) {
+			t.Errorf("Unexpected NotionPlatforms(): expected:%s, got:%s", tt.expected, result)
+		}
 	}
 }
 
-func TestNotionGenresFullfilled(t *testing.T) {
-	game := createFullfilledGame()
-	result := game.NotionGenres()
-	expected := []notionapi.Option{
-		{Name: "Roleplay"},
-		{Name: "Shooter"},
+func TestNotionGenres(t *testing.T) {
+	var game Game = Game{}
+	var tests = []struct {
+		genres   Genres
+		expected []notionapi.Option
+	}{
+		{genres: Genres{}, expected: []notionapi.Option{}},
+		{genres: Genres{{Id: 5, Name: "Roleplay"}, {Id: 6, Name: "Shooter"}}, expected: []notionapi.Option{{Name: "Roleplay"}, {Name: "Shooter"}}},
 	}
 
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionGenres: expected:%s, got:%s", expected, result)
-	}
-}
+	for _, tt := range tests {
+		game.Genres = tt.genres
+		result := game.NotionGenres()
 
-func TestNotionGenresEmpty(t *testing.T) {
-	game := createFullfilledGame()
-	game.Genres = nil
-
-	result := game.NotionGenres()
-	expected := []notionapi.Option{}
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionGenres: expected:%s, got:%s", expected, result)
+		if !reflect.DeepEqual(result, tt.expected) {
+			t.Errorf("Unexpected NotionGenres(): expected:%s, got:%s", tt.expected, result)
+		}
 	}
 }
 
-func TestNotionFranchisesFullfilled(t *testing.T) {
-	game := createFullfilledGame()
-	result := game.NotionFranchises()
-	expected := []notionapi.Option{
-		{Name: "An awesome franchise"},
-		{Name: "Another awesome franchise"},
+func TestNotionFranchises(t *testing.T) {
+	var game Game = Game{}
+	var tests = []struct {
+		franchises Franchises
+		expected   []notionapi.Option
+	}{
+		{franchises: Franchises{}, expected: []notionapi.Option{}},
+		{franchises: Franchises{{Id: 3, Name: "An awesome franchise"}, {Id: 4, Name: "Another awesome franchise"}}, expected: []notionapi.Option{{Name: "An awesome franchise"}, {Name: "Another awesome franchise"}}},
 	}
 
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionFranchises: expected:%s, got:%s", expected, result)
-	}
-}
+	for _, tt := range tests {
+		game.Franchises = tt.franchises
+		result := game.NotionFranchises()
 
-func TestNotionFranchisesEmpty(t *testing.T) {
-	game := createFullfilledGame()
-	game.Franchises = nil
-
-	result := game.NotionFranchises()
-	expected := []notionapi.Option{}
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Unexpected notionFranchises: expected:%s, got:%s", expected, result)
-	}
-}
-func createFullfilledGame() Game {
-	return Game{
-		Id:          1,
-		Name:        "This is a fullfilled game",
-		ReleaseDate: 861199200,
-		Platforms: Platforms{
-			{Id: 1, Name: "Wii"},
-			{Id: 2, Name: "PC"},
-		},
-		Franchises: Franchises{
-			{Id: 3, Name: "An awesome franchise"},
-			{Id: 4, Name: "Another awesome franchise"},
-		},
-		Genres: Genres{
-			{Id: 5, Name: "Roleplay"},
-			{Id: 6, Name: "Shooter"},
-		},
-		Cover: Cover{
-			Id:      7,
-			ImageID: "thisIsACoverID",
-		},
+		if !reflect.DeepEqual(result, tt.expected) {
+			t.Errorf("Unexpected NotionFranchises(): expected:%s, got:%s", tt.expected, result)
+		}
 	}
 }
