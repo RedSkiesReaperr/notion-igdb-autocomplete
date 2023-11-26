@@ -2,6 +2,7 @@ package notion
 
 import (
 	"context"
+	"notion-igdb-autocomplete/howlongtobeat"
 	"notion-igdb-autocomplete/igdb"
 	"time"
 
@@ -20,8 +21,8 @@ func NewPage(id string, client *notionapi.Client) *Page {
 	}
 }
 
-func (p *Page) Update(game *igdb.Game) (*notionapi.Page, error) {
-	request := createUpdateRequest(game)
+func (p *Page) UpdateGameInfos(game *igdb.Game) (*notionapi.Page, error) {
+	request := createGameInfosUpdateRequest(game)
 	pageID := notionapi.PageID(p.Id)
 
 	updatedPage, err := p.apiClient.Page.Update(context.Background(), pageID, &request)
@@ -32,10 +33,22 @@ func (p *Page) Update(game *igdb.Game) (*notionapi.Page, error) {
 	return updatedPage, nil
 }
 
-func createUpdateRequest(game *igdb.Game) (request notionapi.PageUpdateRequest) {
+func (p *Page) UpdateTimeToBeat(timeInfos *howlongtobeat.Game) (*notionapi.Page, error) {
+	request := createTimeToBeatUpdateRequest(timeInfos)
+	pageID := notionapi.PageID(p.Id)
+
+	updatedPage, err := p.apiClient.Page.Update(context.Background(), pageID, &request)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedPage, nil
+}
+
+func createGameInfosUpdateRequest(game *igdb.Game) notionapi.PageUpdateRequest {
 	releaseDate := notionapi.Date(time.Unix(game.ReleaseDate, 0))
 
-	request = notionapi.PageUpdateRequest{
+	return notionapi.PageUpdateRequest{
 		Cover: &notionapi.Image{
 			Type: "external",
 			External: &notionapi.FileObject{
@@ -70,6 +83,41 @@ func createUpdateRequest(game *igdb.Game) (request notionapi.PageUpdateRequest) 
 			},
 		},
 	}
+}
 
-	return
+func createTimeToBeatUpdateRequest(timeInfos *howlongtobeat.Game) notionapi.PageUpdateRequest {
+	return notionapi.PageUpdateRequest{
+		Properties: notionapi.Properties{
+			"Time to complete (Main Story)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: timeInfos.ReadableCompletion(timeInfos.CompletionMain),
+						},
+					},
+				},
+			},
+			"Time to complete (Main + Sides)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: timeInfos.ReadableCompletion(timeInfos.CompletionPlus),
+						},
+					},
+				},
+			},
+			"Time to complete (Completionist)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: timeInfos.ReadableCompletion(timeInfos.CompletionFull),
+						},
+					},
+				},
+			},
+		},
+	}
 }

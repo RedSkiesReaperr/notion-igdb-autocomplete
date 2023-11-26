@@ -50,6 +50,15 @@ This Go project aims to automate the completion of video game information in a N
     - Release date:
         - Name: Release date
         - Type: Date
+    - Time to complete (Main Story)
+        - Name: Time to complete (Main Story)
+        - Type: Text
+    - Time to complete (Main + Sides)
+        - Name: Time to complete (Main + Sides)
+        - Type: Text
+    - Time to complete (Completionist)
+        - Name: Time to complete (Completionist)
+        - Type: Text
 
 3. Create a private Notion integration on your account by following the [getting started page](https://developers.notion.com/docs/create-a-notion-integration#create-your-integration-in-notion) before the "Setting up the demo locally" step.
 

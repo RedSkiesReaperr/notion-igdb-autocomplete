@@ -7,6 +7,7 @@ require github.com/joho/godotenv v1.5.1
 require (
 	github.com/agnivade/levenshtein v1.1.1
 	github.com/caarlos0/env/v9 v9.0.0
+	github.com/corpix/uarand v0.2.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/jomei/notionapi v1.12.9
 )
