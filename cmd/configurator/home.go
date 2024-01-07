@@ -5,6 +5,8 @@ import (
 	"notion-igdb-autocomplete/config"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -13,9 +15,14 @@ type homeModel struct {
 	choices []inputChoice
 	cursor  int
 	err     error
+	keys    keyMap
+	help    help.Model
 }
 
 func newHomeModel(config *config.Config) homeModel {
+	helpModel := help.New()
+	helpModel.ShowAll = true
+
 	return homeModel{
 		config: config,
 		choices: []inputChoice{
@@ -27,6 +34,25 @@ func newHomeModel(config *config.Config) homeModel {
 		},
 		cursor: 0,
 		err:    nil,
+		keys: keyMap{
+			Up: key.NewBinding(
+				key.WithKeys("up"),
+				key.WithHelp("↑", "move up"),
+			),
+			Down: key.NewBinding(
+				key.WithKeys("down"),
+				key.WithHelp("↓", "move down"),
+			),
+			Enter: key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("↵", "save & quit"),
+			),
+			Escape: key.NewBinding(
+				key.WithKeys("esc"),
+				key.WithHelp("esc", "quit without saving"),
+			),
+		},
+		help: helpModel,
 	}
 }
 
@@ -39,22 +65,24 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.err = nil
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.help.Width = msg.Width
 	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyEsc:
+		switch {
+		case key.Matches(msg, m.keys.Escape):
 			return m, tea.Quit
-		case tea.KeyEnter:
+		case key.Matches(msg, m.keys.Enter):
 			if err := m.config.Save(); err != nil { // If something went wrong, report error
 				m.err = err
 			} else {
 				return m, tea.Quit
 			}
-		case tea.KeyUp:
+		case key.Matches(msg, m.keys.Up):
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.choices) - 1
 			}
-		case tea.KeyDown:
+		case key.Matches(msg, m.keys.Down):
 			m.cursor++
 			if m.cursor >= len(m.choices) {
 				m.cursor = 0
@@ -131,7 +159,7 @@ func (m homeModel) renderBody() strings.Builder {
 		cursor := " "
 		style := blurredStyle
 		if i == m.cursor {
-			cursor = "$"
+			cursor = ">"
 			style = focusedStyle
 		}
 
@@ -161,11 +189,7 @@ func (m homeModel) renderErrors() strings.Builder {
 func (m homeModel) renderHelp() strings.Builder {
 	var b strings.Builder
 
-	b.WriteString(fmt.Sprintf("%s %s %s", helpPrimaryStyle.Render("Press"), helpAccentStyle.Render("up/down"), helpPrimaryStyle.Render(fmt.Sprintf("to %s", "move between values"))))
-	b.WriteRune('\n')
-	b.WriteString(fmt.Sprintf("%s %s %s", helpPrimaryStyle.Render("Press"), helpAccentStyle.Render("enter"), helpPrimaryStyle.Render(fmt.Sprintf("to %s", "save & quit"))))
-	b.WriteRune('\n')
-	b.WriteString(fmt.Sprintf("%s %s %s", helpPrimaryStyle.Render("Press"), helpAccentStyle.Render("esc"), helpPrimaryStyle.Render(fmt.Sprintf("to %s", "quit without saving"))))
+	b.WriteString(m.help.View(m.keys))
 
 	return b
 }
