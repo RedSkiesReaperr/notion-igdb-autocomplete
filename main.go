@@ -17,6 +17,12 @@ func main() {
 	teaProgram := tea.NewProgram(app)
 	teaProgram.SetWindowTitle("notion-igdb-autocomplete")
 
+	f, err := tea.LogToFile("debug.log", "debug")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
 	if _, err := teaProgram.Run(); err != nil {
 		log.Fatal(err)
 	}
