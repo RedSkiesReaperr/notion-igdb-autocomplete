@@ -1,6 +1,9 @@
 package tui
 
-type BackMsg struct{}
+type BackMsg struct {
+	Width  int
+	Height int
+}
 
 type SaveConfigMsg struct {
 	NotionApiSecret string
