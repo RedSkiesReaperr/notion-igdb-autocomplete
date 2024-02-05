@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"notion-igdb-autocomplete/config"
 	"notion-igdb-autocomplete/tui"
 	tuiConfiguration "notion-igdb-autocomplete/tui/configuration"
 	tuiDashboard "notion-igdb-autocomplete/tui/dashboard"
@@ -10,30 +11,35 @@ import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type Model struct {
 	choices             []tui.Choice
+	width               int
+	height              int
 	cursor              int // manage choices selector
 	viewState           tui.ViewState
-	dashboard           tea.Model // dashboard view model
-	configuration       tea.Model // configuration view model
-	verifyConfiguration tea.Model // verify configuration view model
-	binds               bindings  // keymap of available controls
+	dashboard           tea.Model              // dashboard view model
+	configuration       tuiConfiguration.Model // configuration view model
+	verifyConfiguration tea.Model              // verify configuration view model
+	binds               bindings               // keymap of available controls
 	help                help.Model
 }
 
-func NewModel() *Model {
+func NewModel(config config.Config) *Model {
 	return &Model{
 		choices: []tui.Choice{
 			{Id: tui.DashboardView, Label: "Dashboard", Description: "Launch program & show monitoring dashboard"},
 			{Id: tui.ConfigurationView, Label: "Configure", Description: "Edit your configuration"},
 			{Id: tui.VerifyConfigurationView, Label: "Verify configuration", Description: "Check if your configuration is correct"},
 		},
+		width:               0,
+		height:              0,
 		cursor:              0,
 		viewState:           tui.MainView,
 		dashboard:           tuiDashboard.NewModel(),
-		configuration:       tuiConfiguration.NewModel(),
+		configuration:       *tuiConfiguration.NewModel(config),
 		verifyConfiguration: tuiVerifyConfig.NewModel(),
 		binds:               newBindings(),
 		help:                help.New(),
@@ -64,8 +70,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
-	switch msg.(type) {
+	switch msg := msg.(type) {
 	case tui.BackMsg:
+		m.width, m.height = msg.Width, msg.Height
 		m.viewState = tui.MainView
 	}
 
@@ -76,7 +83,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = newCmd
 	case tui.ConfigurationView:
 		newModel, newCmd := m.configuration.Update(msg)
-		m.configuration = newModel
+		newConfig, _ := newModel.(tuiConfiguration.Model)
+		m.configuration = newConfig
 		cmd = newCmd
 	case tui.VerifyConfigurationView:
 		newModel, newCmd := m.verifyConfiguration.Update(msg)
@@ -84,6 +92,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = newCmd
 	case tui.MainView:
 		switch msg := msg.(type) {
+		case tea.WindowSizeMsg:
+			m.width, m.height = msg.Width, msg.Height
+			m.configuration.Width, m.configuration.Height = msg.Width, msg.Height
+			return m, nil
 		case tea.KeyMsg:
 			switch {
 			case key.Matches(msg, m.binds.MoveUp):
@@ -122,11 +134,16 @@ func (m Model) View() string {
 			prompt = ">"
 		}
 
-		view += fmt.Sprintf("%s %s\n  %s\n\n", prompt, c.Label, c.Description)
+		prompt = choicePromptStyle.Render(prompt)
+		label := choiceLabelStyle.Render(c.Label)
+		desc := choiceDescStyle.Render(c.Description)
+
+		view += fmt.Sprintf("%s %s\n %s\n\n\n", prompt, label, desc)
 	}
 
-	view += m.help.View(m.binds)
-	view += "\n"
+	headerContent := headerStyle.Copy().Width(m.width).Render("Notion IGDB autocomplete")
+	mainContent := mainStyle.Copy().Width(m.width).Height(m.height - headerStyle.GetHeight() - helpStyle.GetHeight()).Render(view)
+	helpContent := helpStyle.Copy().Width(m.width).Render(m.help.View(m.binds))
 
-	return view
+	return lipgloss.JoinVertical(lipgloss.Top, headerContent, mainContent, helpContent)
 }

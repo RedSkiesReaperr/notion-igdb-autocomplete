@@ -11,12 +11,14 @@ import (
 type App struct {
 	config *config.Config
 	model  tea.Model
+	alert  tea.Model
 }
 
 func NewApp(conf *config.Config) *App {
 	return &App{
 		config: conf,
-		model:  tuiApp.NewModel(),
+		model:  tuiApp.NewModel(*conf),
+		alert:  nil,
 	}
 }
 
@@ -29,10 +31,6 @@ func (m App) Init() tea.Cmd {
 func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
-	newModel, newCmd := m.model.Update(msg)
-
-	m.model = newModel
-	cmd = newCmd
 
 	switch msg.(type) {
 	case tui.SaveConfigMsg:
@@ -43,6 +41,10 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.config.IGDBSecret = casted.IgdbSecret
 		m.config.RefreshDelay = casted.RefreshDelay
 		m.config.Save()
+	default:
+		newModel, newCmd := m.model.Update(msg)
+		m.model = newModel
+		cmd = newCmd
 	}
 
 	cmds = append(cmds, cmd)
