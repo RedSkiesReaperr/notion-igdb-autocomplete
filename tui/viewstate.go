@@ -7,4 +7,5 @@ const (
 	DashboardView
 	ConfigurationView
 	VerifyConfigurationView
+	DialogView
 )
