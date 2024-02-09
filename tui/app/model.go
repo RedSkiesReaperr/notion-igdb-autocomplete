@@ -22,7 +22,7 @@ type Model struct {
 	height              int
 	cursor              int // manage choices selector
 	viewState           tui.ViewState
-	dashboard           tea.Model              // dashboard view model
+	dashboard           tuiDashboard.Model     // dashboard view model
 	configuration       tuiConfiguration.Model // configuration view model
 	verifyConfiguration tea.Model              // verify configuration view model
 	dialog              tuiDialog.Model
@@ -98,7 +98,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.viewState {
 	case tui.DashboardView:
 		newModel, newCmd := m.dashboard.Update(msg)
-		m.dashboard = newModel
+		newDash, _ := newModel.(tuiDashboard.Model)
+		m.dashboard = newDash
 		cmd = newCmd
 	case tui.ConfigurationView:
 		newModel, newCmd := m.configuration.Update(msg)
@@ -106,8 +107,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.configuration = newConfig
 		cmd = newCmd
 	case tui.VerifyConfigurationView:
-		newModel, newCmd := m.verifyConfiguration.Update(msg)
-		m.dashboard = newModel
+		newModel, newCmd := m.configuration.Update(msg)
+		newVerifConfig, _ := newModel.(tuiVerifyConfig.Model)
+		m.verifyConfiguration = newVerifConfig
 		cmd = newCmd
 	case tui.DialogView:
 		newModel, newCmd := m.dialog.Update(msg)
@@ -118,6 +120,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg := msg.(type) {
 		case tea.WindowSizeMsg:
 			m.width, m.height = msg.Width, msg.Height
+			m.dashboard.Width, m.dashboard.Height = msg.Width, msg.Height
 			m.configuration.Width, m.configuration.Height = msg.Width, msg.Height
 			m.dialog.Width, m.dialog.Height = msg.Width, msg.Height
 			return m, nil
