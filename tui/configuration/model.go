@@ -29,7 +29,7 @@ type Model struct {
 	Height  int
 }
 
-func NewModel(initialConf config.Config) *Model {
+func NewModel(initialConf config.Config) Model {
 	values := configValues{
 		notionApiSecret: initialConf.NotionAPISecret,
 		notionPageId:    initialConf.NotionPageID,
@@ -46,7 +46,7 @@ func NewModel(initialConf config.Config) *Model {
 		newInputChoice(&values.refreshDelay, "Refresh delay", tui.ValidateInteger),
 	}
 
-	return &Model{
+	return Model{
 		cursor:  0,
 		values:  &values,
 		choices: choices,

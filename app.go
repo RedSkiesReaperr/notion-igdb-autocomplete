@@ -2,7 +2,6 @@ package main
 
 import (
 	"notion-igdb-autocomplete/config"
-	"notion-igdb-autocomplete/tui"
 	tuiApp "notion-igdb-autocomplete/tui/app"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,14 +10,12 @@ import (
 type App struct {
 	config *config.Config
 	model  tea.Model
-	alert  tea.Model
 }
 
 func NewApp(conf *config.Config) *App {
 	return &App{
 		config: conf,
-		model:  tuiApp.NewModel(*conf),
-		alert:  nil,
+		model:  tuiApp.NewModel(conf),
 	}
 }
 
@@ -29,26 +26,7 @@ func (m App) Init() tea.Cmd {
 
 // Update implements tea.Model interface
 func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-	var cmds []tea.Cmd
-
-	switch msg.(type) {
-	case tui.SaveConfigMsg:
-		casted := msg.(tui.SaveConfigMsg)
-		m.config.NotionAPISecret = casted.NotionApiSecret
-		m.config.NotionPageID = casted.NotionPageId
-		m.config.IGDBClientID = casted.IgdbClientId
-		m.config.IGDBSecret = casted.IgdbSecret
-		m.config.RefreshDelay = casted.RefreshDelay
-		m.config.Save()
-	default:
-		newModel, newCmd := m.model.Update(msg)
-		m.model = newModel
-		cmd = newCmd
-	}
-
-	cmds = append(cmds, cmd)
-	return m, tea.Batch(cmds...)
+	return m.model.Update(msg)
 }
 
 // View implements tea.Model interface

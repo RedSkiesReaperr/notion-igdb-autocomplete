@@ -6,6 +6,7 @@ import (
 	"notion-igdb-autocomplete/tui"
 	tuiConfiguration "notion-igdb-autocomplete/tui/configuration"
 	tuiDashboard "notion-igdb-autocomplete/tui/dashboard"
+	tuiDialog "notion-igdb-autocomplete/tui/dialog"
 	tuiVerifyConfig "notion-igdb-autocomplete/tui/verifyconfiguration"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -15,6 +16,7 @@ import (
 )
 
 type Model struct {
+	config              *config.Config
 	choices             []tui.Choice
 	width               int
 	height              int
@@ -23,12 +25,14 @@ type Model struct {
 	dashboard           tea.Model              // dashboard view model
 	configuration       tuiConfiguration.Model // configuration view model
 	verifyConfiguration tea.Model              // verify configuration view model
-	binds               bindings               // keymap of available controls
+	dialog              tuiDialog.Model
+	binds               bindings // keymap of available controls
 	help                help.Model
 }
 
-func NewModel(config config.Config) *Model {
+func NewModel(config *config.Config) *Model {
 	return &Model{
+		config: config,
 		choices: []tui.Choice{
 			{Id: tui.DashboardView, Label: "Dashboard", Description: "Launch program & show monitoring dashboard"},
 			{Id: tui.ConfigurationView, Label: "Configure", Description: "Edit your configuration"},
@@ -39,8 +43,9 @@ func NewModel(config config.Config) *Model {
 		cursor:              0,
 		viewState:           tui.MainView,
 		dashboard:           tuiDashboard.NewModel(),
-		configuration:       *tuiConfiguration.NewModel(config),
+		configuration:       tuiConfiguration.NewModel(*config),
 		verifyConfiguration: tuiVerifyConfig.NewModel(),
+		dialog:              tuiDialog.NewModel(),
 		binds:               newBindings(),
 		help:                help.New(),
 	}
@@ -55,6 +60,8 @@ func (m Model) currentView() tea.Model {
 		return m.configuration
 	case tui.VerifyConfigurationView:
 		return m.verifyConfiguration
+	case tui.DialogView:
+		return m.dialog
 	default:
 		return m
 	}
@@ -74,6 +81,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tui.BackMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.viewState = tui.MainView
+	case tui.SaveConfigMsg:
+		if err := m.saveConfig(msg); err != nil {
+			m.dialog.Title = "Saving configuration"
+			m.dialog.Message = fmt.Sprintf("An error happened while saving your configuration settings:\n\n%s", err.Error())
+			m.dialog.Type = tuiDialog.ErrorDialog
+			m.viewState = tui.DialogView
+		} else {
+			m.dialog.Title = "Saving configuration"
+			m.dialog.Message = "All your configuration settings have been successfully saved !"
+			m.dialog.Type = tuiDialog.SuccessDialog
+			m.viewState = tui.DialogView
+		}
 	}
 
 	switch m.viewState {
@@ -90,11 +109,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		newModel, newCmd := m.verifyConfiguration.Update(msg)
 		m.dashboard = newModel
 		cmd = newCmd
+	case tui.DialogView:
+		newModel, newCmd := m.dialog.Update(msg)
+		newDialog, _ := newModel.(tuiDialog.Model)
+		m.dialog = newDialog
+		cmd = newCmd
 	case tui.MainView:
 		switch msg := msg.(type) {
 		case tea.WindowSizeMsg:
 			m.width, m.height = msg.Width, msg.Height
 			m.configuration.Width, m.configuration.Height = msg.Width, msg.Height
+			m.dialog.Width, m.dialog.Height = msg.Width, msg.Height
 			return m, nil
 		case tea.KeyMsg:
 			switch {
@@ -146,4 +171,15 @@ func (m Model) View() string {
 	helpContent := helpStyle.Copy().Width(m.width).Render(m.help.View(m.binds))
 
 	return lipgloss.JoinVertical(lipgloss.Top, headerContent, mainContent, helpContent)
+}
+
+func (m Model) saveConfig(newValues tui.SaveConfigMsg) error {
+	//TODO: If save error happened, reset config to previous values
+	m.config.NotionAPISecret = newValues.NotionApiSecret
+	m.config.NotionPageID = newValues.NotionPageId
+	m.config.IGDBClientID = newValues.IgdbClientId
+	m.config.IGDBSecret = newValues.IgdbSecret
+	m.config.RefreshDelay = newValues.RefreshDelay
+
+	return m.config.Save()
 }
