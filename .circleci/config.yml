@@ -3,11 +3,10 @@
 version: 2.1
 
 orbs:
-  go: circleci/go@1.9.0
-  docker: circleci/docker@2.4.0
+  go: circleci/go@1.11.0
 
 jobs:
-  build_updater:
+  build:
     executor:
       name: go/default
       tag: 1.21.1
@@ -17,21 +16,8 @@ jobs:
       - go/mod-download
       - go/save-cache
       - run:
-          name: Build updater
-          command: go build -v -o ./updater cmd/updater/main.go
-
-  build_watcher:
-    executor:
-      name: go/default
-      tag: 1.21.1
-    steps:
-      - checkout
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
-      - run:
-          name: Build watcher
-          command: go build -v -o ./watcher cmd/watcher/main.go
+          name: Build application
+          command: make ci
 
   test:
     executor:
@@ -50,9 +36,7 @@ jobs:
 workflows:
   main:
     jobs:
-      - build_watcher
-      - build_updater
+      - build
       - test:
           requires:
-            - build_watcher
-            - build_updater
+            - build

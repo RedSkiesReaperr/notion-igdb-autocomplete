@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	"github.com/jomei/notionapi"
 )
 
 type Result struct {
@@ -29,4 +31,42 @@ func (g Game) ReadableCompletion(rawCompletion int) string {
 	}
 
 	return fmt.Sprintf("%dh", hours)
+}
+
+// Implements notion.PageUpdateRequester interface
+func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
+	return notionapi.PageUpdateRequest{
+		Properties: notionapi.Properties{
+			"Time to complete (Main Story)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: g.ReadableCompletion(g.CompletionMain),
+						},
+					},
+				},
+			},
+			"Time to complete (Main + Sides)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: g.ReadableCompletion(g.CompletionPlus),
+						},
+					},
+				},
+			},
+			"Time to complete (Completionist)": notionapi.RichTextProperty{
+				Type: notionapi.PropertyTypeRichText,
+				RichText: []notionapi.RichText{
+					{
+						Text: &notionapi.Text{
+							Content: g.ReadableCompletion(g.CompletionFull),
+						},
+					},
+				},
+			},
+		},
+	}
 }

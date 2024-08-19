@@ -30,7 +30,7 @@ func (c Client) SearchGame(gameName string) (Games, error) {
 		return games, fmt.Errorf("invalid request body: %s", err)
 	}
 
-	req, _ := http.NewRequest("POST", "https://howlongtobeat.com/api/search", strings.NewReader(string(requestBody)))
+	req, _ := http.NewRequest("POST", "https://howlongtobeat.com/api/search/5683ebd079f1c360", strings.NewReader(string(requestBody)))
 	req.Header = map[string][]string{
 		"Content-Type": {"application/json"},
 		"User-Agent":   {c.UserAgent},

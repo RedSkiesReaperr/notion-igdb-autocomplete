@@ -2,6 +2,7 @@ package igdb
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jomei/notionapi"
 )
@@ -36,10 +37,26 @@ type Cover struct {
 	ImageID string `json:"image_id,required"`
 }
 
-type Games []*Game
 type Platforms []Platform
 type Franchises []Franchise
 type Genres []Genre
+
+type Games []*Game
+
+func (g Games) String() string {
+	str := ""
+	for i, game := range g {
+		gameName := fmt.Sprintf("'%s'", game.Name)
+
+		if i == 0 || i == len(g)-1 {
+			str += gameName
+		} else {
+			str += fmt.Sprintf(", %s", gameName)
+		}
+	}
+
+	return str
+}
 
 func (g *Game) CoverURL() string {
 	return fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.png", g.Cover.ImageID)
@@ -73,4 +90,45 @@ func (g *Game) NotionFranchises() []notionapi.Option {
 	}
 
 	return franchises
+}
+
+// Implements notion.PageUpdateRequester interface
+func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
+	releaseDate := notionapi.Date(time.Unix(g.ReleaseDate, 0))
+
+	return notionapi.PageUpdateRequest{
+		Cover: &notionapi.Image{
+			Type: "external",
+			External: &notionapi.FileObject{
+				URL: g.CoverURL(),
+			},
+		},
+		Properties: notionapi.Properties{
+			"Title": notionapi.TitleProperty{
+				Type: notionapi.PropertyTypeTitle,
+				Title: []notionapi.RichText{
+					{Text: &notionapi.Text{Content: g.Name}},
+				},
+			},
+			"Release date": notionapi.DateProperty{
+				Type: notionapi.PropertyTypeDate,
+
+				Date: &notionapi.DateObject{
+					Start: &releaseDate,
+				},
+			},
+			"Franchises": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: g.NotionFranchises(),
+			},
+			"Genres": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: g.NotionGenres(),
+			},
+			"Platforms": notionapi.MultiSelectProperty{
+				Type:        notionapi.PropertyTypeMultiSelect,
+				MultiSelect: g.NotionPlatforms(),
+			},
+		},
+	}
 }

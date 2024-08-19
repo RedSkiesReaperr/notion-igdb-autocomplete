@@ -1,0 +1,4 @@
+.circleci/
+bin/*
+.env*
+*.log

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -69,6 +68,5 @@ func (*Token) retrieve(clientID string, secret string) (authResponse, error) {
 		return authResponse{}, err
 	}
 
-	log.Println("Authentication succeed!")
 	return response, nil
 }
