@@ -103,7 +103,7 @@ Once you are on the Twitch developers portal:
 	$ ./bin/app
 	```
 
-By running the app this way you will get into a nicer and clearer TUI (terminal user interface) than the more conventional way to run. You can navigate through it by using your keyboard. It will also help you to have a better understanding of whats going on. Here is a sneak peak of this TUI:
+By running the app this way you will get into a nicer and clearer TUI (text-based user interface) than the more conventional way to run. You can navigate through it by using your keyboard. It will also help you to have a better understanding of whats going on. Here is a sneak peak of this TUI:
 ![tui-demo](https://github.com/user-attachments/assets/3a0dca3a-7d67-42ff-8c35-016b7f55abd7)
 
 ### Running with Docker
