@@ -123,6 +123,14 @@ $ docker run \
 	redskiesreaperr/notion-igdb-autocomplete:latest
 ```
 
+## Build a release image
+```bash
+$ docker build \
+	--platform linux/386,linux/amd64,linux/arm,linux/arm64 \
+	-t image:tag \
+	.
+```
+
 ## Dependencies
 Thanks to all the authors who created and maintains the following packages:
 - [agnivade/levenshtein](github.com/agnivade/levenshtein)
