@@ -142,6 +142,7 @@ Thanks to all the authors who created and maintains the following packages:
 - [google/uuid](https://github.com/google/uuid)
 - [jomei/notionapi](https://github.com/jomei/notionapi)
 - [spf13/viper](https://github.com/spf13/viper)
+- [RedSkiesReaperr/howlongtobeat](https://github.com/RedSkiesReaperr/howlongtobeat)
 
 ## Contributing
 If you wish to contribute to this project, please follow these steps:

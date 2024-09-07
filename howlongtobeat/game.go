@@ -5,24 +5,15 @@ import (
 	"math"
 	"time"
 
+	"github.com/RedSkiesReaperr/howlongtobeat"
 	"github.com/jomei/notionapi"
 )
 
-type Result struct {
-	Count int   `json:"count,required"`
-	Data  Games `json:"data,required"`
+type GameWrapper struct {
+	Game *howlongtobeat.Game
 }
 
-type Game struct {
-	Name           string `json:"game_name,required"`
-	CompletionMain int    `json:"comp_main,required"`
-	CompletionPlus int    `json:"comp_plus,required"`
-	CompletionFull int    `json:"comp_100,required"`
-}
-
-type Games []Game
-
-func (g Game) ReadableCompletion(rawCompletion int) string {
+func (ug GameWrapper) readableCompletion(rawCompletion int) string {
 	duration := time.Duration(rawCompletion * int(time.Second))
 	hours := int(math.Round(duration.Hours()))
 
@@ -34,7 +25,7 @@ func (g Game) ReadableCompletion(rawCompletion int) string {
 }
 
 // Implements notion.PageUpdateRequester interface
-func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
+func (ug GameWrapper) UpdateRequest() notionapi.PageUpdateRequest {
 	return notionapi.PageUpdateRequest{
 		Properties: notionapi.Properties{
 			"Time to complete (Main Story)": notionapi.RichTextProperty{
@@ -42,7 +33,7 @@ func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
 				RichText: []notionapi.RichText{
 					{
 						Text: &notionapi.Text{
-							Content: g.ReadableCompletion(g.CompletionMain),
+							Content: ug.readableCompletion(ug.Game.CompletionMain),
 						},
 					},
 				},
@@ -52,7 +43,7 @@ func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
 				RichText: []notionapi.RichText{
 					{
 						Text: &notionapi.Text{
-							Content: g.ReadableCompletion(g.CompletionPlus),
+							Content: ug.readableCompletion(ug.Game.CompletionPlus),
 						},
 					},
 				},
@@ -62,7 +53,7 @@ func (g Game) UpdateRequest() notionapi.PageUpdateRequest {
 				RichText: []notionapi.RichText{
 					{
 						Text: &notionapi.Text{
-							Content: g.ReadableCompletion(g.CompletionFull),
+							Content: ug.readableCompletion(ug.Game.CompletionFull),
 						},
 					},
 				},

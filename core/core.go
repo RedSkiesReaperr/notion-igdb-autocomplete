@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 	"notion-igdb-autocomplete/config"
-	"notion-igdb-autocomplete/howlongtobeat"
 	"notion-igdb-autocomplete/igdb"
 	"notion-igdb-autocomplete/notion"
 	"time"
 
+	"github.com/RedSkiesReaperr/howlongtobeat"
 	"github.com/jomei/notionapi"
 )
 

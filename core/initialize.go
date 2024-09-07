@@ -3,9 +3,11 @@ package core
 import (
 	"fmt"
 	"log"
-	"notion-igdb-autocomplete/howlongtobeat"
+
 	"notion-igdb-autocomplete/igdb"
 	"notion-igdb-autocomplete/notion"
+
+	"github.com/RedSkiesReaperr/howlongtobeat"
 )
 
 func (c *Core) initializeNotion() error {
@@ -41,8 +43,12 @@ func (c *Core) initializeIGDB() error {
 func (c *Core) initializeHLTB() error {
 	log.Println("Initializing HowLongToBeat client")
 	log.Println(".... Creating")
-	client := howlongtobeat.NewClient()
-	c.hltb = &client
+	client, err := howlongtobeat.New()
+	if err != nil {
+		return fmt.Errorf("create failed: %v", err)
+	}
+
+	c.hltb = client
 
 	log.Println(".... Success!")
 	return nil
