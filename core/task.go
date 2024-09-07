@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 	"notion-igdb-autocomplete/choose"
-	"notion-igdb-autocomplete/howlongtobeat"
+	hltb "notion-igdb-autocomplete/howlongtobeat"
 	"notion-igdb-autocomplete/igdb"
 	"notion-igdb-autocomplete/notion"
 	"strings"
 	"time"
 
+	"github.com/RedSkiesReaperr/howlongtobeat"
 	"github.com/google/uuid"
 )
 
@@ -139,19 +140,25 @@ func (t *Task) runGameInfos(notionClient *notion.Client, igdbClient *igdb.Client
 }
 
 func (t *Task) runTimeToBeat(notionClient *notion.Client, hltbClient *howlongtobeat.Client) error {
+	req, err := howlongtobeat.NewSearchRequest(t.Query)
+	if err != nil {
+		return err
+	}
+
 	// Fetch
-	games, err := hltbClient.SearchGame(t.Query)
+	response, err := hltbClient.Search(req)
 	if err != nil {
 		return err
 	}
 
 	foundGame := &howlongtobeat.Game{Name: fmt.Sprintf("Not found (%s)", t.Query), CompletionMain: 0, CompletionPlus: 0, CompletionFull: 0}
-	if len(games) > 0 {
-		foundGame = &games[0]
+	if len(response.Data) > 0 {
+		foundGame = &response.Data[0]
 	}
 
 	// Update
-	_, err = notionClient.Page(t.NotionId).Update(foundGame)
+	wrappedGame := hltb.GameWrapper{Game: foundGame}
+	_, err = notionClient.Page(t.NotionId).Update(wrappedGame)
 	if err != nil {
 		return err
 	}
