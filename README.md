@@ -133,15 +133,15 @@ $ docker build \
 
 ## Dependencies
 Thanks to all the authors who created and maintains the following packages:
-- [agnivade/levenshtein](github.com/agnivade/levenshtein)
-- [charmbracelet/bubbles](github.com/charmbracelet/bubbles)
-- [charmbracelet/bubbletea](github.com/charmbracelet/bubbletea)
-- [charmbracelet/lipgloss](github.com/charmbracelet/lipgloss)
-- [corpix/uarand](github.com/corpix/uarand)
-- [fsnotify/fsnotify](github.com/fsnotify/fsnotify)
-- [google/uuid](github.com/google/uuid)
-- [jomei/notionapi](github.com/jomei/notionapi)
-- [spf13/viper](github.com/spf13/viper)
+- [agnivade/levenshtein](https://github.com/agnivade/levenshtein)
+- [charmbracelet/bubbles](https://github.com/charmbracelet/bubbles)
+- [charmbracelet/bubbletea](https://github.com/charmbracelet/bubbletea)
+- [charmbracelet/lipgloss](https://github.com/charmbracelet/lipgloss)
+- [corpix/uarand](https://github.com/corpix/uarand)
+- [fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)
+- [google/uuid](https://github.com/google/uuid)
+- [jomei/notionapi](https://github.com/jomei/notionapi)
+- [spf13/viper](https://github.com/spf13/viper)
 
 ## Contributing
 If you wish to contribute to this project, please follow these steps:
