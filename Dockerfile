@@ -12,6 +12,8 @@ RUN make docker
 # Release stage
 FROM alpine:3.18
 
+RUN apk update && apk add --no-cache chromium
+
 WORKDIR /bin
 COPY --from=build /usr/local/bin/igdb-app /bin/igdb-app
 RUN touch .env
