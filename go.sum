@@ -2,6 +2,8 @@ github.com/RedSkiesReaperr/howlongtobeat v0.1.0 h1:HlNtiaXWkIxDNCQBustbsNDxjVSxe
 github.com/RedSkiesReaperr/howlongtobeat v0.1.0/go.mod h1:urJQvzpSQSp3FsHOloXM+GxCt3yKFAmhsBeDmSM09eA=
 github.com/RedSkiesReaperr/howlongtobeat v0.1.1 h1:EyWu74Nnz+AE3w3bu0ma4IqCmM+63grRS4miIugG6+I=
 github.com/RedSkiesReaperr/howlongtobeat v0.1.1/go.mod h1:urJQvzpSQSp3FsHOloXM+GxCt3yKFAmhsBeDmSM09eA=
+github.com/RedSkiesReaperr/howlongtobeat v1.0.0 h1:7wwthYdtvjl549gE4yoGqTLc3d5uGXqnetfL81IxGIo=
+github.com/RedSkiesReaperr/howlongtobeat v1.0.0/go.mod h1:urJQvzpSQSp3FsHOloXM+GxCt3yKFAmhsBeDmSM09eA=
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
