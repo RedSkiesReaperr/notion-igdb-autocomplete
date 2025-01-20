@@ -126,8 +126,9 @@ $ docker run \
 ## Build a release image
 ```bash
 $ docker build \
-	--platform linux/386,linux/amd64,linux/arm,linux/arm64 \
-	-t image:tag \
+	--platform linux/amd64,linux/arm,linux/arm64 \
+	-t image:x.x.x \
+	-t image:latest \
 	.
 ```
 
