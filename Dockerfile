@@ -1,4 +1,4 @@
-FROM golang:1.21.1-alpine AS build
+FROM golang:1.26.0-alpine AS build
 
 RUN apk update && apk add --no-cache make
 
@@ -10,7 +10,7 @@ COPY . .
 RUN make docker
 
 # Release stage
-FROM alpine:3.18
+FROM alpine:latest
 
 RUN apk update && apk add --no-cache chromium
 

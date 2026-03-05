@@ -9,7 +9,7 @@ jobs:
   build:
     executor:
       name: go/default
-      tag: 1.21.1
+      tag: 1.26.0
     steps:
       - checkout
       - go/load-cache
@@ -22,7 +22,7 @@ jobs:
   test:
     executor:
       name: go/default
-      tag: 1.21.1
+      tag: 1.26.0
     steps:
       - checkout
       - go/load-cache
