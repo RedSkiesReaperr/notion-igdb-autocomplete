@@ -3,7 +3,7 @@ module notion-igdb-autocomplete
 go 1.26.0
 
 require (
-	github.com/RedSkiesReaperr/howlongtobeat v1.1.0
+	github.com/RedSkiesReaperr/howlongtobeat v1.1.1
 	github.com/agnivade/levenshtein v1.2.1
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
