@@ -45,3 +45,11 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Project-specific
+/legacy
+/docs
+/.claude
+/CLAUDE.md
+/spec
+

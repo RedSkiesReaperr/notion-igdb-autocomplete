@@ -1,0 +1,30 @@
+services:
+  web:
+    image: redskiesreaperr/notion-igdb-autocomplete:latest
+    ports:
+      - "3000:3000"
+    env_file: .env
+    volumes:
+      - sqlite_data:/app/storage
+    depends_on:
+      - worker
+    command: >
+      bash -c "
+        bundle exec rails db:prepare &&
+        bundle exec rails runner '
+          unless SolidQueue::Job.where(class_name: \"NotionWatcherJob\", finished_at: nil).exists?
+            NotionWatcherJob.perform_later
+          end
+        ' &&
+        bundle exec rails server -b 0.0.0.0
+      "
+
+  worker:
+    image: redskiesreaperr/notion-igdb-autocomplete:latest
+    env_file: .env
+    volumes:
+      - sqlite_data:/app/storage
+    command: bundle exec rake solid_queue:start
+
+volumes:
+  sqlite_data:
