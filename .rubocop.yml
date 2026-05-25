@@ -1,0 +1,62 @@
+plugins:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
+AllCops:
+  TargetRubyVersion: 4.0
+  TargetRailsVersion: 8.1
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "db/migrate/*.rb"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+    - "storage/**/*"
+    - "tmp/**/*"
+    - "log/**/*"
+    - "legacy/**/*"
+    - "config/initializers/inflections.rb"
+
+# --- Layout ---------------------------------------------------------------
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - "config/**/*"
+    - "spec/**/*"
+
+# --- Style ----------------------------------------------------------------
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# --- Metrics --------------------------------------------------------------
+Metrics/BlockLength:
+  Exclude:
+    - "config/**/*"
+    - "spec/**/*"
+    - "Gemfile"
+
+Metrics/MethodLength:
+  Max: 20
+
+# --- RSpec ----------------------------------------------------------------
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/NestedGroups:
+  Max: 4
