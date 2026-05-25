@@ -5,34 +5,35 @@ on:
   pull_request:
 
 jobs:
-  build:
+  rubocop:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          go-version: '1.26.0'
-          cache: true
+            ruby-version: .ruby-version
+            bundler-cache: true
 
-      - name: Install dependencies
-        run: go mod download
+      - name: Run RuboCop
+        run: bundle exec rubocop --no-color
 
-      - name: Build application
-        run: make ci
-
-  test:
+  rspec:
     runs-on: ubuntu-latest
-    needs: build
+    env:
+      RAILS_ENV: test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          go-version: '1.26.0'
-          cache: true
+          ruby-version: .ruby-version
+          bundler-cache: true
 
-      - name: Run tests
-        run: go test -v -covermode=atomic -failfast -race ./...
+      - name: Prepare test database
+        run: bin/rails db:test:prepare
+
+      - name: Run RSpec
+        run: bundle exec rspec
