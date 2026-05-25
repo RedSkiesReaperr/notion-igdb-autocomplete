@@ -11,8 +11,7 @@ AllCops:
   SuggestExtensions: false
   Exclude:
     - "bin/**/*"
-    - "db/schema.rb"
-    - "db/migrate/*.rb"
+    - "db/**/*"
     - "vendor/**/*"
     - "node_modules/**/*"
     - "storage/**/*"
@@ -21,27 +20,24 @@ AllCops:
     - "legacy/**/*"
     - "config/initializers/inflections.rb"
 
-# --- Layout ---------------------------------------------------------------
 Layout/LineLength:
   Max: 120
   Exclude:
     - "config/**/*"
     - "spec/**/*"
 
-# --- Style ----------------------------------------------------------------
 Style/Documentation:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  Enabled: true
 
 Style/StringLiterals:
-  EnforcedStyle: double_quotes
+  EnforcedStyle: single_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
-# --- Metrics --------------------------------------------------------------
 Metrics/BlockLength:
   Exclude:
     - "config/**/*"
@@ -51,7 +47,6 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Max: 20
 
-# --- RSpec ----------------------------------------------------------------
 RSpec/ExampleLength:
   Max: 15
 
